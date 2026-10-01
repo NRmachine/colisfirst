@@ -1,0 +1,3 @@
+@extends('layouts.market')
+@section('title','Confirmer mon adresse e-mail')
+@section('content')<section class="wrap section narrow"><h1 class="page-title">Confirmez votre adresse e-mail</h1><div class="panel"><p>Un lien de confirmation est envoyé à l’adresse renseignée à l’inscription lorsque le service e-mail est configuré.</p>@if(session('status')==='verification-link-sent')<p role="status">Un nouvel envoi a été demandé. Vérifiez votre boîte de réception et les courriers indésirables.</p>@endif<form action="{{ route('verification.send') }}" method="post">@csrf<button class="btn">Renvoyer le lien de confirmation</button></form><p><a href="{{ route('dashboard') }}">Retour à mon espace</a></p></div></section>@endsection

@@ -1,0 +1,30 @@
+ColisFirst — ajout NoSQL pour la compétence 6
+
+Fonction : cinq dernières recherches de trajets par session, stockées dans une liste Redis. LREM supprime un doublon ; LPUSH place la recherche en tête ; LTRIM limite à cinq ; EXPIRE fixe 24 heures depuis la dernière recherche. Ces écritures sont regroupées dans une transaction Redis. LRANGE lit les recherches ; DEL efface la liste. Les trajets et réservations restent dans la base SQL.
+
+Le composant app/Services/SearchHistory.php utilise Predis 3.6.1. La clé contient un HMAC de l'identifiant de session, pas l'identifiant brut. Le contenu est limité aux filtres validés origin/country/date/sort. La suppression utilise DELETE avec protection CSRF et ne reçoit pas de clé à supprimer depuis le navigateur. Si Redis est indisponible, la recherche SQL fonctionne ; une suppression échouée n'est pas annoncée comme réussie.
+
+Activation locale : SEARCH_HISTORY_ENABLED=true dans .env. Configuration config/search_history.php, variables SEARCH_REDIS_HOST, SEARCH_REDIS_PORT, SEARCH_REDIS_PASSWORD, SEARCH_REDIS_DB. Par défaut la fonctionnalité est désactivée pour les autres installations et pour les tests ordinaires. Redis local dédié écoute uniquement sur 127.0.0.1:6381, avec persistance AOF dans storage/app/redis-search. Ce service lancé localement n'est pas un déploiement en production, ni un service configuré pour démarrer automatiquement après redémarrage du Mac.
+
+Démarrer Redis après redémarrage (depuis /Users/rayane/colisfirst/colisfirst) :
+mkdir -p storage/app/redis-search
+/opt/homebrew/bin/redis-server --bind 127.0.0.1 --port 6381 --protected-mode yes --appendonly yes --dir /Users/rayane/colisfirst/colisfirst/storage/app/redis-search --daemonize yes --pidfile /Users/rayane/colisfirst/colisfirst/storage/app/redis-search/redis.pid --logfile /Users/rayane/colisfirst/colisfirst/storage/app/redis-search/redis.log
+/opt/homebrew/bin/redis-cli -p 6381 ping
+
+Tests reproductibles dans le terminal :
+cd /Users/rayane/colisfirst/colisfirst
+PAO_DISABLE=1 RUN_REDIS_TESTS=1 APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL='' /opt/homebrew/bin/php artisan test --filter=SearchHistory
+
+Les tests réels créent uniquement des clés de test isolées puis les suppriment. Ils vérifient : lecture/écriture, dédoublonnage, limite5, type Redis list, TTL, isolation entre sessions, suppression, affichage et suppression via HTTP. Le test de panne simule une indisponibilité Redis. Les migrations de test s'exécutent dans SQLite en mémoire.
+
+Captures pour le dossier :
+1. Après une recherche Paris / Algérie : bloc Mes recherches récentes sur /trajets.
+2. Après Effacer mes recherches : message de confirmation et disparition du bloc.
+3. SearchHistory.php : méthodes remember, recent et clear.
+4. Terminal : tests SearchHistory avec RUN_REDIS_TESTS=1 (aucun test Redis ignoré).
+
+Sources techniques :
+https://laravel.com/framework/docs/redis
+https://redis.io/docs/latest/develop/data-types/lists/
+
+Cette fonctionnalité est un ajout réalisé avec assistance pendant la préparation du dossier. Elle constitue un exemple NoSQL réel ; elle ne garantit pas à elle seule la validation de la compétence par le jury.
