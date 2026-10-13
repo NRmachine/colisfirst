@@ -33,7 +33,7 @@ class StripeWebhookController extends Controller
             $object = $event->data->object->toArray();
             if (str_starts_with($event->type, 'checkout.session.')) {
                 $booking = Booking::where('stripe_session_id', $object['id'])->lockForUpdate()->first();
-                // Retry later if a session was created but the local database commit failed.
+                // Réessayer si la session Stripe n’a pas été enregistrée.
                 if (! $booking && ! data_get($object['metadata'], 'booking_id')) {
                     return;
                 }

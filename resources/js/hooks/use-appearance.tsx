@@ -83,7 +83,7 @@ export function initializeTheme(): void {
     currentAppearance = getStoredAppearance();
     applyTheme(currentAppearance);
 
-    // Set up system theme change listener
+    // Suivre le thème du système.
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
@@ -101,10 +101,10 @@ export function useAppearance(): UseAppearanceReturn {
     const updateAppearance = (mode: Appearance): void => {
         currentAppearance = mode;
 
-        // Store in localStorage for client-side persistence...
+        // Mémoriser le thème dans le navigateur.
         localStorage.setItem('appearance', mode);
 
-        // Store in cookie for SSR...
+        // Partager le thème avec le serveur.
         setCookie('appearance', mode);
 
         applyTheme(mode);

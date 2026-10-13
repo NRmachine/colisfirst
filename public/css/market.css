@@ -1405,7 +1405,7 @@ footer {
     }
 }
 
-/* Le fichier PNG est affiché entièrement, sans rognage. */
+/* Logo sans recadrage. */
 .brand {
     width: 270px;
     height: 88px;

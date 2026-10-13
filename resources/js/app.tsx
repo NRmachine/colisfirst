@@ -12,8 +12,6 @@ void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
-                return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
@@ -36,5 +34,5 @@ void createInertiaApp({
     },
 });
 
-// This will set light / dark mode on load...
+// Appliquer le thème au chargement.
 initializeTheme();

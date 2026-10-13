@@ -1,18 +1,32 @@
+name: colisfirst-production
 services:
   app:
+    image: colisfirst-production:current
     build: .
     restart: unless-stopped
     env_file: .env.production
-    ports:
-      - "127.0.0.1:8080:8080"
-    volumes:
-      - colisfirst_storage:/var/www/html/storage
+    ports: ['127.0.0.1:8103:8080']
+    volumes: ['colisfirst_storage:/var/www/html/storage']
+    depends_on:
+      database:
+        condition: service_healthy
+    mem_limit: 1g
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/up"]
+      test: ['CMD', 'wget', '-q', '--spider', 'http://127.0.0.1:8080/up']
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 60s
-
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file: .env.database
+    volumes: ['colisfirst_database:/var/lib/postgresql/data']
+    mem_limit: 512m
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      retries: 20
 volumes:
   colisfirst_storage:
+  colisfirst_database:

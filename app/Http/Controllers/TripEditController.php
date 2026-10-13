@@ -37,6 +37,6 @@ class TripEditController extends Controller
             $locked->update($data);
         });
 
-        return redirect()->route('trips.show', $trip)->with('success','Votre trajet a été mis à jour.');
+        return redirect()->route('trips.show', $trip)->with('success', 'Votre trajet a été mis à jour.');
     }
 }

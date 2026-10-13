@@ -21,7 +21,7 @@ class PaymentController extends Controller
             $url = DB::transaction(function () use ($booking, $payments) {
                 $booking = Booking::lockForUpdate()->findOrFail($booking->id);
                 abort_unless(in_array($booking->status, ['accepted', 'payment_pending']) && in_array($booking->payment_status, ['unpaid', 'processing']), 422);
-                // Always retrieve an existing session before creating another checkout.
+                // Réutiliser la session de paiement existante.
                 if ($booking->stripe_session_id) {
                     $session = $payments->client()->checkout->sessions->retrieve($booking->stripe_session_id, []);
                     if ($session->status === 'open') {
@@ -38,7 +38,7 @@ class PaymentController extends Controller
 
             return redirect()->away($url);
         } catch (ApiErrorException $exception) {
-            // Do not expose Stripe responses or credentials to the browser/log.
+            // Ne pas exposer les réponses privées de Stripe.
             return back()->withErrors(['payment' => 'Le paiement est momentanément indisponible. Réessayez dans quelques instants.']);
         }
     }

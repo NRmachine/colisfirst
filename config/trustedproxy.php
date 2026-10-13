@@ -1,6 +1,6 @@
 <?php
 
 return [
-    // Use "*" only when the application is reachable solely through the hosting proxy.
+    // Utiliser « * » uniquement derrière le proxy de l’hébergeur.
     'proxies' => env('TRUSTED_PROXIES'),
 ];

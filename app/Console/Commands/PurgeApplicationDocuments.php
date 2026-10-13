@@ -30,7 +30,7 @@ class PurgeApplicationDocuments extends Command
             }
             $remaining = $application->documents;
             foreach ($remaining as $kind => $path) {
-                // Never remove shared fixtures or a file belonging to another user.
+                // Conserver les fichiers partagés et ceux des autres utilisateurs.
                 if (str_starts_with($path, 'applications/'.$application->user_id.'/') && ! str_contains($path, '..')) {
                     if (Storage::disk(config('filesystems.private_documents'))->exists($path) && ! Storage::disk(config('filesystems.private_documents'))->delete($path)) {
                         continue;

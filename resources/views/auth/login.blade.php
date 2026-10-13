@@ -4,7 +4,7 @@
     <section class="wrap section auth-grid">
         <div>
             <span class="eyebrow">MON COMPTE</span>
-            <h1 class="page-title">Vos réservations.<br>Vos trajets.<br>
+            <h1 class="page-title">Vos réservations. <br>Vos trajets. <br>
                 <em>Votre suivi.</em>
             </h1>
             <p>Retrouvez vos réservations et gardez le contact<br>avec les personnes qui transportent vos colis.</p>

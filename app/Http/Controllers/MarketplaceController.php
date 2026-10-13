@@ -127,7 +127,7 @@ class MarketplaceController extends Controller
         abort_if($trip->user_id === $request->user()->id, 403);
         $validated = $request->validate(['weight_kg' => 'required|integer|min:1|max:1000', 'contents' => 'required|string|min:10|max:2000', 'declared_value' => 'required|numeric|min:0|max:5000', 'recipient_name' => 'required|string|max:120', 'recipient_phone' => 'required|string|max:30', 'recipient_address' => 'required|string|max:500', 'declaration' => 'accepted']);
         $booking = DB::transaction(function () use ($request, $trip, $validated) {
-            // The write lock serializes capacity checks, including on SQLite.
+            // Verrouiller la capacité pendant la réservation.
             Trip::whereKey($trip->id)->update(['updated_at' => now()]);
             $trip = Trip::lockForUpdate()->findOrFail($trip->id);
             abort_unless($trip->status === 'published' && $trip->departure_date->isFuture() && $trip->driver->account_status === 'approved', 422, 'Ce trajet ne peut plus être réservé.');

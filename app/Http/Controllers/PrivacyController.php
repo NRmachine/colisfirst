@@ -33,7 +33,7 @@ class PrivacyController extends Controller
     public function export(Request $request): StreamedResponse
     {
         $user = $request->user();
-        // Never export passwords, identity files, private paths or other users’ contact details.
+        // Exclure les secrets et les données privées des autres comptes.
         $data = [
             'account_details' => $user->account_details,
             'notifications' => AccountAlert::where('user_id', $user->id)->get(['title', 'read_at', 'created_at']),
